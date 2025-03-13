@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { BsGoogle } from "react-icons/bs";
 import { AiFillGithub } from "react-icons/ai";
 import { UseUserAuth } from "../firebase/auth";
-import { addBlock } from "../firebase/firestore";
+import { addBlock, getBlocks } from "../firebase/firestore";
 
 // Dynamically import the Editor component with no SSR
 const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
@@ -71,12 +71,28 @@ export default function Home() {
     }
 
     useEffect(() => {
-        // Only access localStorage on the client-side
-        const savedData = localStorage.getItem("editorData");
-        if (savedData) {
-            setData(JSON.parse(savedData));
+        if (user) {
+            const fetchData = async () => {
+                try {
+                    const blocksData = await getBlocks(user.uid); // Get data from Firebase
+                    if (blocksData && blocksData.length > 0) {
+                        setData(blocksData[0]); // Assuming the data is stored as a single document
+                    }
+                    else {
+                        const savedData = localStorage.getItem("editorData");
+                        if (savedData > 0) {
+                            setData(JSON.parse(savedData));
+                        } else {
+                            setData(INITIAL_DATA);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching blocks from Firebase:", error);
+                }
+            };
+            fetchData();
         }
-    }, []);
+    }, [user]);
 
     async function handleSaveData() {
         try {
@@ -120,14 +136,14 @@ export default function Home() {
                         <h1 className="text-5xl font-bold m-2 justify-center flex">
                             Sign in to continue
                         </h1>
-                        <button
+                        {/* <button
                             className="text-white p-2 m-2 rounded-md bg-[#555555] flex flex-row w-80 gap-4 text-[25px]"
                             onClick={signInGithub}
                             disabled={isLoading}
                         >
                             <AiFillGithub className="mt-1 ml-4" />
                             Sign in with GitHub
-                        </button>
+                        </button> */}
                         <button
                             className="text-white p-2 m-2 rounded-md bg-blue-700 flex flex-row w-80 gap-4 text-[25px]"
                             onClick={signInGoogle}
