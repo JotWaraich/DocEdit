@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { BsGoogle } from "react-icons/bs";
 import { AiFillGithub } from "react-icons/ai";
-import { UseUserAuth } from "../firebase/auth";
-import { addBlock, getBlocks } from "../firebase/firestore";
+import { UseUserAuth } from "../../firebase/auth";
+import { addBlock, getBlocks } from "../../firebase/firestore";
 
 // Dynamically import the Editor component with no SSR
-const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
+const Editor = dynamic(() => import("../../components/Editor"), { ssr: false });
 
 const INITIAL_DATA = {
     time: new Date().getTime(),
